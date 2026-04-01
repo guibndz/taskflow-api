@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 use Illuminate\Database\Eloquent\Model;
 
 class Profile extends Model
 {
-    // $fillable protege contra Mass Assignment (só esses campos podem ser inseridos via código diretamente)
+    use HasFactory;
+
     protected $fillable = [
         'user_id', 
         'bio', 
