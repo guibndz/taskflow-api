@@ -10,12 +10,16 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('profiles', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('profiles', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+        $table->text('bio')->nullable();
+        $table->string('phone')->nullable();
+        $table->string('avatar_url')->nullable();
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

@@ -10,12 +10,18 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('projects', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('projects', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+        $table->string('name');
+        $table->text('description')->nullable();
+        // O enum garante que o status só aceite os valores exigidos no documento
+        $table->enum('status', ['open', 'in_progress', 'completed'])->default('open');
+        $table->date('deadline')->nullable();
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.
