@@ -33,4 +33,17 @@ class ProjectService
         $project->delete();
         return true;
     }
+
+    public function updateProject(int $id, array $data): ?Project
+    {
+        $project = Project::find($id);
+        
+        if (!$project) {
+            return null;
+        }
+
+        $project->update($data);
+        
+        return $project;
+    }
 }

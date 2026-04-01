@@ -71,4 +71,28 @@ class ProjectController extends Controller
             'message' => 'Projeto excluído com sucesso.' // A exclusão em cascata das tasks já está no banco de dados!
         ], 200);
     }
+
+    public function update(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'sometimes|in:open,in_progress,completed',
+            'deadline' => 'nullable|date',
+        ]);
+
+        $project = $this->projectService->updateProject($id, $validatedData);
+
+        if (!$project) {
+            return response()->json([
+                'message' => 'Projeto não encontrado.',
+                'status' => 404
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => $project,
+            'message' => 'Projeto atualizado com sucesso.'
+        ], 200);
+    }
 }
