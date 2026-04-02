@@ -1,0 +1,1425 @@
+{
+	"openapi": "3.0.3",
+	"info": {
+		"title": "TaskFlow API",
+		"description": "Documentação da API do projeto TaskFlow (Projects, Tasks, Tags, Task-Tag e Profile).",
+		"version": "1.0.0"
+	},
+	"servers": [
+		{
+			"url": "http://localhost/api",
+			"description": "Servidor local"
+		}
+	],
+	"tags": [
+		{
+			"name": "Projects"
+		},
+		{
+			"name": "Tasks"
+		},
+		{
+			"name": "Tags"
+		},
+		{
+			"name": "TaskTag"
+		},
+		{
+			"name": "Profiles"
+		}
+	],
+	"paths": {
+		"/projects": {
+			"get": {
+				"tags": [
+					"Projects"
+				],
+				"summary": "Listar projetos",
+				"operationId": "listProjects",
+				"responses": {
+					"200": {
+						"description": "Lista de projetos",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"data": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Project"
+											}
+										}
+									},
+									"required": [
+										"data"
+									]
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"Projects"
+				],
+				"summary": "Criar projeto",
+				"operationId": "createProject",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ProjectCreateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Projeto criado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/DataProjectResponse"
+										},
+										{
+											"type": "object",
+											"properties": {
+												"message": {
+													"type": "string",
+													"example": "Projeto criado com sucesso."
+												}
+											},
+											"required": [
+												"message"
+											]
+										}
+									]
+								}
+							}
+						}
+					},
+					"422": {
+						"$ref": "#/components/responses/ValidationError"
+					}
+				}
+			}
+		},
+		"/projects/{id}": {
+			"get": {
+				"tags": [
+					"Projects"
+				],
+				"summary": "Buscar projeto por ID",
+				"operationId": "getProjectById",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/ProjectId"
+					}
+				],
+				"responses": {
+					"200": {
+						"$ref": "#/components/responses/ProjectData"
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundProjeto"
+					}
+				}
+			},
+			"put": {
+				"tags": [
+					"Projects"
+				],
+				"summary": "Atualizar projeto",
+				"operationId": "updateProject",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/ProjectId"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ProjectUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Projeto atualizado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/DataProjectResponse"
+										},
+										{
+											"type": "object",
+											"properties": {
+												"message": {
+													"type": "string",
+													"example": "Projeto atualizado com sucesso."
+												}
+											},
+											"required": [
+												"message"
+											]
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundProjeto"
+					},
+					"422": {
+						"$ref": "#/components/responses/ValidationError"
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"Projects"
+				],
+				"summary": "Excluir projeto",
+				"operationId": "deleteProject",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/ProjectId"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Projeto excluído",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Projeto excluído com sucesso."
+										}
+									},
+									"required": [
+										"message"
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundProjeto"
+					}
+				}
+			}
+		},
+		"/projects/{id}/tasks": {
+			"get": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Listar tarefas de um projeto",
+				"operationId": "listTasksByProject",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/ProjectId"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Lista de tarefas",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"data": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/TaskWithRelations"
+											}
+										}
+									},
+									"required": [
+										"data"
+									]
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Criar tarefa em projeto",
+				"operationId": "createTaskInProject",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/ProjectId"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TaskCreateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Tarefa criada",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/DataTaskResponse"
+										},
+										{
+											"type": "object",
+											"properties": {
+												"message": {
+													"type": "string",
+													"example": "Tarefa criada com sucesso."
+												}
+											},
+											"required": [
+												"message"
+											]
+										}
+									]
+								}
+							}
+						}
+					},
+					"422": {
+						"$ref": "#/components/responses/ValidationError"
+					}
+				}
+			}
+		},
+		"/projects/{id}/tasks/{taskId}": {
+			"get": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Buscar tarefa por ID em projeto",
+				"operationId": "getTaskByIdInProject",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/ProjectId"
+					},
+					{
+						"$ref": "#/components/parameters/TaskId"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Tarefa encontrada",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/TaskWithRelations"
+										}
+									},
+									"required": [
+										"data"
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundTarefaProjeto"
+					}
+				}
+			},
+			"put": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Atualizar tarefa",
+				"operationId": "updateTaskInProject",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/ProjectId"
+					},
+					{
+						"$ref": "#/components/parameters/TaskId"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TaskUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Tarefa atualizada",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/DataTaskResponse"
+										},
+										{
+											"type": "object",
+											"properties": {
+												"message": {
+													"type": "string",
+													"example": "Tarefa atualizada com sucesso."
+												}
+											},
+											"required": [
+												"message"
+											]
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundTarefaProjeto"
+					},
+					"422": {
+						"$ref": "#/components/responses/ValidationError"
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Excluir tarefa",
+				"operationId": "deleteTaskInProject",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/ProjectId"
+					},
+					{
+						"$ref": "#/components/parameters/TaskId"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Tarefa excluída",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Tarefa excluída com sucesso."
+										}
+									},
+									"required": [
+										"message"
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundTarefaProjeto"
+					}
+				}
+			}
+		},
+		"/projects/{id}/tasks/{taskId}/status": {
+			"patch": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Atualizar somente status da tarefa",
+				"operationId": "updateTaskStatusInProject",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/ProjectId"
+					},
+					{
+						"$ref": "#/components/parameters/TaskId"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TaskStatusUpdateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Status atualizado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/DataTaskResponse"
+										},
+										{
+											"type": "object",
+											"properties": {
+												"message": {
+													"type": "string",
+													"example": "Status da tarefa atualizado com sucesso."
+												}
+											},
+											"required": [
+												"message"
+											]
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundTarefa"
+					},
+					"422": {
+						"$ref": "#/components/responses/ValidationError"
+					}
+				}
+			}
+		},
+		"/tags": {
+			"get": {
+				"tags": [
+					"Tags"
+				],
+				"summary": "Listar tags",
+				"operationId": "listTags",
+				"responses": {
+					"200": {
+						"description": "Lista de tags",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"data": {
+											"type": "array",
+											"items": {
+												"$ref": "#/components/schemas/Tag"
+											}
+										}
+									},
+									"required": [
+										"data"
+									]
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"Tags"
+				],
+				"summary": "Criar tag",
+				"operationId": "createTag",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TagCreateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Tag criada",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/DataTagResponse"
+										},
+										{
+											"type": "object",
+											"properties": {
+												"message": {
+													"type": "string",
+													"example": "Tag criada com sucesso."
+												}
+											},
+											"required": [
+												"message"
+											]
+										}
+									]
+								}
+							}
+						}
+					},
+					"422": {
+						"$ref": "#/components/responses/ValidationError"
+					}
+				}
+			}
+		},
+		"/tasks/{taskId}/tags/{tagId}": {
+			"post": {
+				"tags": [
+					"TaskTag"
+				],
+				"summary": "Associar tag a tarefa",
+				"operationId": "attachTagToTask",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/TaskId"
+					},
+					{
+						"$ref": "#/components/parameters/TagId"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Tag associada",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								},
+								"examples": {
+									"success": {
+										"value": {
+											"message": "Tag associada com sucesso!"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundTarefa"
+					},
+					"409": {
+						"description": "Conflito ao associar tag",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								},
+								"examples": {
+									"alreadyAttached": {
+										"value": {
+											"message": "Esta tag já está associada a esta tarefa."
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"TaskTag"
+				],
+				"summary": "Remover tag da tarefa",
+				"operationId": "detachTagFromTask",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/TaskId"
+					},
+					{
+						"$ref": "#/components/parameters/TagId"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Tag removida",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								},
+								"examples": {
+									"success": {
+										"value": {
+											"message": "Tag removida com sucesso."
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundTarefa"
+					}
+				}
+			}
+		},
+		"/users/{id}/profile": {
+			"get": {
+				"tags": [
+					"Profiles"
+				],
+				"summary": "Buscar perfil por usuário",
+				"operationId": "getProfileByUser",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/UserId"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Perfil encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/Profile"
+										}
+									},
+									"required": [
+										"data"
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"$ref": "#/components/responses/NotFoundPerfil"
+					}
+				}
+			},
+			"put": {
+				"tags": [
+					"Profiles"
+				],
+				"summary": "Atualizar ou criar perfil de usuário",
+				"operationId": "upsertUserProfile",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/UserId"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ProfileUpsertRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Perfil salvo",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"type": "object",
+											"properties": {
+												"data": {
+													"$ref": "#/components/schemas/Profile"
+												}
+											},
+											"required": [
+												"data"
+											]
+										},
+										{
+											"type": "object",
+											"properties": {
+												"message": {
+													"type": "string",
+													"example": "Perfil salvo com sucesso."
+												}
+											},
+											"required": [
+												"message"
+											]
+										}
+									]
+								}
+							}
+						}
+					},
+					"422": {
+						"$ref": "#/components/responses/ValidationError"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"parameters": {
+			"ProjectId": {
+				"name": "id",
+				"in": "path",
+				"required": true,
+				"schema": {
+					"type": "integer",
+					"example": 1
+				}
+			},
+			"TaskId": {
+				"name": "taskId",
+				"in": "path",
+				"required": true,
+				"schema": {
+					"type": "integer",
+					"example": 10
+				}
+			},
+			"TagId": {
+				"name": "tagId",
+				"in": "path",
+				"required": true,
+				"schema": {
+					"type": "integer",
+					"example": 3
+				}
+			},
+			"UserId": {
+				"name": "id",
+				"in": "path",
+				"required": true,
+				"schema": {
+					"type": "integer",
+					"example": 2
+				}
+			}
+		},
+		"responses": {
+			"ValidationError": {
+				"description": "Erro de validação",
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"message": {
+									"type": "string",
+									"example": "The given data was invalid."
+								},
+								"errors": {
+									"type": "object",
+									"additionalProperties": {
+										"type": "array",
+										"items": {
+											"type": "string"
+										}
+									}
+								}
+							},
+							"required": [
+								"message",
+								"errors"
+							]
+						}
+					}
+				}
+			},
+			"ProjectData": {
+				"description": "Projeto encontrado",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/DataProjectResponse"
+						}
+					}
+				}
+			},
+			"NotFoundProjeto": {
+				"description": "Projeto não encontrado",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/ErrorWithStatus"
+						},
+						"examples": {
+							"notFound": {
+								"value": {
+									"message": "Projeto não encontrado.",
+									"status": 404
+								}
+							}
+						}
+					}
+				}
+			},
+			"NotFoundTarefa": {
+				"description": "Tarefa não encontrada",
+				"content": {
+					"application/json": {
+						"schema": {
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							]
+						},
+						"examples": {
+							"notFound": {
+								"value": {
+									"message": "Tarefa não encontrada."
+								}
+							}
+						}
+					}
+				}
+			},
+			"NotFoundTarefaProjeto": {
+				"description": "Tarefa não encontrada no projeto",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/ErrorWithStatus"
+						},
+						"examples": {
+							"notFound": {
+								"value": {
+									"message": "Tarefa não encontrada neste projeto.",
+									"status": 404
+								}
+							}
+						}
+					}
+				}
+			},
+			"NotFoundPerfil": {
+				"description": "Perfil não encontrado",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/ErrorWithStatus"
+						},
+						"examples": {
+							"notFound": {
+								"value": {
+									"message": "Perfil não encontrado.",
+									"status": 404
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"schemas": {
+			"Project": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"user_id": {
+						"type": "integer",
+						"example": 2
+					},
+					"name": {
+						"type": "string",
+						"example": "Website Redesign"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true,
+						"example": "Redesenhar interface do portal."
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"open",
+							"in_progress",
+							"completed"
+						],
+						"example": "open"
+					},
+					"deadline": {
+						"type": "string",
+						"format": "date",
+						"nullable": true,
+						"example": "2026-05-15"
+					},
+					"tasks_count": {
+						"type": "integer",
+						"example": 3
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2026-04-02T10:00:00.000000Z"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2026-04-02T10:30:00.000000Z"
+					}
+				},
+				"required": [
+					"id",
+					"user_id",
+					"name",
+					"status",
+					"created_at",
+					"updated_at"
+				]
+			},
+			"ProjectCreateRequest": {
+				"type": "object",
+				"properties": {
+					"user_id": {
+						"type": "integer",
+						"example": 2
+					},
+					"name": {
+						"type": "string",
+						"maxLength": 255,
+						"example": "Website Redesign"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"open",
+							"in_progress",
+							"completed"
+						],
+						"default": "open"
+					},
+					"deadline": {
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					}
+				},
+				"required": [
+					"user_id",
+					"name"
+				]
+			},
+			"ProjectUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"maxLength": 255
+					},
+					"description": {
+						"type": "string",
+						"nullable": true
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"open",
+							"in_progress",
+							"completed"
+						]
+					},
+					"deadline": {
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					}
+				},
+				"minProperties": 1
+			},
+			"Task": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 10
+					},
+					"project_id": {
+						"type": "integer",
+						"example": 1
+					},
+					"title": {
+						"type": "string",
+						"example": "Definir wireframes"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true,
+						"example": "Criar wireframes para páginas principais"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"pending",
+							"in_progress",
+							"done"
+						],
+						"example": "pending"
+					},
+					"priority": {
+						"type": "string",
+						"enum": [
+							"low",
+							"medium",
+							"high"
+						],
+						"example": "medium"
+					},
+					"due_date": {
+						"type": "string",
+						"format": "date",
+						"nullable": true,
+						"example": "2026-05-10"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2026-04-02T10:00:00.000000Z"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2026-04-02T10:30:00.000000Z"
+					}
+				},
+				"required": [
+					"id",
+					"project_id",
+					"title",
+					"status",
+					"priority",
+					"created_at",
+					"updated_at"
+				]
+			},
+			"TaskWithRelations": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Task"
+					},
+					{
+						"type": "object",
+						"properties": {
+							"project": {
+								"$ref": "#/components/schemas/Project"
+							},
+							"tags": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/Tag"
+								}
+							}
+						}
+					}
+				]
+			},
+			"TaskCreateRequest": {
+				"type": "object",
+				"properties": {
+					"title": {
+						"type": "string",
+						"maxLength": 255,
+						"example": "Definir wireframes"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"pending",
+							"in_progress",
+							"done"
+						],
+						"default": "pending"
+					},
+					"priority": {
+						"type": "string",
+						"enum": [
+							"low",
+							"medium",
+							"high"
+						],
+						"default": "medium"
+					},
+					"due_date": {
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					}
+				},
+				"required": [
+					"title"
+				]
+			},
+			"TaskUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"title": {
+						"type": "string",
+						"maxLength": 255
+					},
+					"description": {
+						"type": "string",
+						"nullable": true
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"pending",
+							"in_progress",
+							"done"
+						]
+					},
+					"priority": {
+						"type": "string",
+						"enum": [
+							"low",
+							"medium",
+							"high"
+						]
+					},
+					"due_date": {
+						"type": "string",
+						"format": "date",
+						"nullable": true
+					}
+				},
+				"minProperties": 1
+			},
+			"TaskStatusUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": [
+							"pending",
+							"in_progress",
+							"done"
+						],
+						"example": "done"
+					}
+				},
+				"required": [
+					"status"
+				]
+			},
+			"Tag": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 3
+					},
+					"name": {
+						"type": "string",
+						"example": "frontend"
+					},
+					"color": {
+						"type": "string",
+						"nullable": true,
+						"pattern": "^#([A-Fa-f0-9]{6})$",
+						"example": "#FF0000"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2026-04-02T10:00:00.000000Z"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2026-04-02T10:30:00.000000Z"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"created_at",
+					"updated_at"
+				]
+			},
+			"TagCreateRequest": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"maxLength": 255,
+						"example": "frontend"
+					},
+					"color": {
+						"type": "string",
+						"nullable": true,
+						"maxLength": 7,
+						"pattern": "^#([A-Fa-f0-9]{6})$",
+						"example": "#FF0000"
+					}
+				},
+				"required": [
+					"name"
+				]
+			},
+			"Profile": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"user_id": {
+						"type": "integer",
+						"example": 2
+					},
+					"bio": {
+						"type": "string",
+						"nullable": true,
+						"example": "Desenvolvedor full stack"
+					},
+					"phone": {
+						"type": "string",
+						"nullable": true,
+						"maxLength": 20,
+						"example": "+55 11 99999-9999"
+					},
+					"avatar_url": {
+						"type": "string",
+						"format": "uri",
+						"nullable": true,
+						"example": "https://example.com/avatar.png"
+					},
+					"created_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2026-04-02T10:00:00.000000Z"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2026-04-02T10:30:00.000000Z"
+					}
+				},
+				"required": [
+					"id",
+					"user_id",
+					"created_at",
+					"updated_at"
+				]
+			},
+			"ProfileUpsertRequest": {
+				"type": "object",
+				"properties": {
+					"bio": {
+						"type": "string",
+						"nullable": true
+					},
+					"phone": {
+						"type": "string",
+						"nullable": true,
+						"maxLength": 20
+					},
+					"avatar_url": {
+						"type": "string",
+						"format": "uri",
+						"nullable": true
+					}
+				}
+			},
+			"DataProjectResponse": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Project"
+					}
+				},
+				"required": [
+					"data"
+				]
+			},
+			"DataTaskResponse": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Task"
+					}
+				},
+				"required": [
+					"data"
+				]
+			},
+			"DataTagResponse": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Tag"
+					}
+				},
+				"required": [
+					"data"
+				]
+			},
+			"MessageResponse": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"message"
+				]
+			},
+			"ErrorWithStatus": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string"
+					},
+					"status": {
+						"type": "integer",
+						"example": 404
+					}
+				},
+				"required": [
+					"message",
+					"status"
+				]
+			}
+		}
+	}
+}
