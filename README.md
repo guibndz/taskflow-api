@@ -1,58 +1,160 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Taskflow API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview  
+The Taskflow API allows you to manage tasks, users, and workflows. With Docker support, it's easy to set up and run the API locally or in production.
 
-## About Laravel
+## Table of Contents
+- [Installation Instructions](#installation-instructions)
+- [Running Migrations and Seeders](#running-migrations-and-seeders)
+- [Testing Endpoints](#testing-endpoints)
+- [License](#license)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Installation Instructions
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Prerequisites
+- Docker and Docker Compose installed on your machine
+- Git installed
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Steps
 
-## Learning Laravel
+1. **Clone the repository**  
+   ```bash  
+   git clone https://github.com/guibndz/taskflow-api.git  
+   cd taskflow-api  
+   ```  
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. **Copy environment configuration**  
+   ```bash  
+   cp .env.example .env  
+   ```  
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. **Build the Docker containers**  
+   ```bash  
+   docker-compose build  
+   ```  
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+4. **Run the Docker containers**  
+   ```bash  
+   docker-compose up -d  
+   ```  
 
-## Agentic Development
+5. **Install PHP dependencies**  
+   ```bash  
+   docker-compose exec app composer install  
+   ```  
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+6. **Generate application key**  
+   ```bash  
+   docker-compose exec app php artisan key:generate  
+   ```  
 
-```bash
-composer require laravel/boost --dev
+7. **Verify the API is running**  
+   The API will be available at `http://localhost:8000`
 
-php artisan boost:install
+## Running Migrations and Seeders
+
+To run migrations and seed the database with sample data:
+
+```bash  
+docker-compose exec app php artisan migrate --seed  
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Individual Commands
 
-## Contributing
+If you prefer to run migrations and seeders separately:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Run migrations only:**
+```bash
+docker-compose exec app php artisan migrate
+```
 
-## Code of Conduct
+**Run seeders only:**
+```bash
+docker-compose exec app php artisan db:seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Rollback migrations:**
+```bash
+docker-compose exec app php artisan migrate:rollback
+```
 
-## Security Vulnerabilities
+**Reset database (migrate:fresh):**
+```bash
+docker-compose exec app php artisan migrate:fresh --seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Testing Endpoints
 
-## License
+You can use tools like **Postman**, **Insomnia**, or **curl** to test the endpoints. Make sure the server is running before testing any endpoints.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Using curl
+
+#### Get all tasks  
+```bash  
+curl -X GET http://localhost:8000/api/tasks  
+```
+
+#### Create a new task  
+```bash  
+curl -X POST http://localhost:8000/api/tasks \  
+  -H 'Content-Type: application/json' \  
+  -d '{"name": "New Task", "description": "Task description"}'  
+```
+
+#### Get a specific task  
+```bash  
+curl -X GET http://localhost:8000/api/tasks/1  
+```
+
+#### Update a task  
+```bash  
+curl -X PUT http://localhost:8000/api/tasks/1 \  
+  -H 'Content-Type: application/json' \  
+  -d '{"name": "Updated Task", "description": "Updated description"}'  
+```
+
+#### Delete a task  
+```bash  
+curl -X DELETE http://localhost:8000/api/tasks/1  
+```
+
+### Using Postman or Insomnia
+
+1. Import the API endpoints or create them manually
+2. Set the request method (GET, POST, PUT, DELETE)
+3. Set the base URL to `http://localhost:8000/api`
+4. For POST/PUT requests, add JSON body with appropriate headers
+5. Send the request and check the response
+
+### Running Tests
+
+To run the test suite:
+
+```bash
+docker-compose exec app php artisan test
+```
+
+Or with more details:
+
+```bash
+docker-compose exec app php artisan test --verbose
+```
+
+## Troubleshooting
+
+### Containers not starting
+```bash
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+### Database connection issues
+Verify your `.env` file has correct database credentials matching `compose.yaml`
+
+### Port already in use
+Change the port mapping in `compose.yaml` if port 8000 is already in use
+
+## License  
+MIT License  
+See `LICENSE` for details.
