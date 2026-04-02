@@ -33,4 +33,22 @@ class TaskService
         $task->update(['status' => $status]);
         return $task;
     }
+
+    public function updateTask(int $taskId, array $data): ?Task
+    {
+        $task = Task::find($taskId);
+        if (!$task) return null;
+        
+        $task->update($data);
+        return $task;
+    }
+
+    public function deleteTask(int $taskId): bool
+    {
+        $task = Task::find($taskId);
+        if (!$task) return false;
+        
+        $task->delete();
+        return true;
+    }
 }
